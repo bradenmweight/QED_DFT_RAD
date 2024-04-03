@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH -p debug
+#SBATCH -J He
+#SBATCH -o output.slurm
+#SBATCH -t 1:00:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem 2GB
+
+module load gaussian
+
+# ADD THIS TO ALL GAUSSIAN JOBS
+export GAUSS_SCRDIR=/local_scratch/$SLURM_JOB_ID
+
+g16 < geometry.com > geometry.out
+formchk geometry.chk
+
+
+
