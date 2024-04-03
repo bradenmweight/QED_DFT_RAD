@@ -71,6 +71,32 @@ def numpy_DFT_3D( f_x, N=None ):
 
     return f_k
 
+def my_DFT_3D( x, f_x ):
+    """
+    NOT WORKING YET.
+    """
+
+    dx = x[:,1] - x[:,0]
+    N = f_x.shape
+
+    # Create a 3D grid of indices
+    n1, n2, n3 = np.meshgrid(np.arange(N[0]), np.arange(N[1]), np.arange(N[2]), indexing='ij')
+
+    # Calculate the phase factors
+    #a = N//2 # Centered transform: Shift the indices to the center # TODO
+    theta = 2 * np.pi * (n1 * np.arange(N[0])[:, None, None] / N[0] +
+                        n2 * np.arange(N[1])[None, :, None] / N[1] +
+                        n3 * np.arange(N[2])[None, None, :] / N[2])
+
+    # Operate W on the real-space function
+    W = np.exp( -1j * theta )
+    f_k = np.sum(W[:,:,:] * f_x[:,:,:,None], axis=(0, 1, 2))
+    
+    # Add normalization and integral infinitesimal
+    f_k *= np.prod(dx) / np.sqrt( 2 * np.pi ) ** 3
+
+    return f_k
+
 if ( __name__ == "__main__" ):
     from matplotlib import pyplot as plt
     """
@@ -112,10 +138,11 @@ if ( __name__ == "__main__" ):
                          * np.exp( -XGRID[:] **2 / 2 ) * np.exp( -1j * 2 * np.pi * k0 * XGRID[:]  )
     
     f_x = f_x / np.linalg.norm(f_x)
-    #print( "Norm x", np.linalg.norm(f_x) )
-    f_k   = numpy_DFT_3D( f_x, N=(Nx,Nx,Nx) )
+    print( "Norm x", np.linalg.norm(f_x) )
+    #f_k   = numpy_DFT_3D( f_x, N=(Nx,Nx,Nx) )
+    f_k   = my_DFT_3D( np.array([XGRID,XGRID,XGRID]), f_x )
     KGRID = get_KGRID_3D( np.array([XGRID, XGRID, XGRID]), N=(Nx,Nx,Nx) )
-    #print( "Norm k", np.linalg.norm(f_k) )
+    print( "Norm k", np.linalg.norm(f_k) )
 
     X,Y = np.meshgrid(XGRID,XGRID)
     plt.imshow( f_x[:,:,Nx//2].real, origin='lower' )
