@@ -6,10 +6,12 @@ from numba import njit
 from time import time
 import subprocess as sp
 
+from findiff import FinDiff
+
 def get_globals():
 
     global N_SCF_ITER, dE_THRESH, do_COMPENSATION, do_TIMING
-    N_SCF_ITER = 100
+    N_SCF_ITER = 20
     dE_THRESH  = 1e-5
     do_COMPENSATION = True
     do_TIMING = False
@@ -17,8 +19,14 @@ def get_globals():
     # Real space grid x
     global Nx, xGRID, dx
     Nx    = 10
-    xGRID = np.linspace(-3, 3, Nx)
-    dx    = xGRID[1] - xGRID[0]
+    XMIN  = -3
+    XMAX  =  3
+    # xGRID = np.linspace(-3, 3, Nx)
+    # dx    = xGRID[1] - xGRID[0]
+    x_nu = np.r_[np.linspace(XMIN, 0.5, 3, endpoint=False), np.linspace(0.5, 1.2, 7, endpoint=False),
+                 np.linspace(1.2, 1.9, 2, endpoint=False), np.linspace(1.9, 2.9, 5, endpoint=False),
+                 np.linspace(2.9, 10, 3)]
+    
     print( "Matrix Dimension: (%1.0f,%1.0f)" % (Nx**3,Nx**3) )
     print( "Grid Spacing: %1.3f a.u." % dx )
 
